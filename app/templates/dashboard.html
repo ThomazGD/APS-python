@@ -1,0 +1,289 @@
+{% extends "base.html" %}
+
+{% block title %}Meu Painel - Score Ambiental{% endblock %}
+
+{% block extra_css %}
+<style>
+    .score-card {
+        border-radius: 15px;
+        transition: transform 0.3s;
+    }
+    .score-card:hover {
+        transform: translateY(-5px);
+    }
+    .progress {
+        height: 10px;
+        border-radius: 5px;
+    }
+    .activity-item {
+        border-left: 3px solid #198754;
+        padding-left: 15px;
+        margin-bottom: 15px;
+    }
+    .activity-item .badge {
+        font-size: 0.8em;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0">Meu Painel</h1>
+    <div>
+        <span class="badge bg-success">Nível {{ metrics.level }}</span>
+        <span class="ms-2">{{ "%.1f"|format(metrics.total_score) }} pontos</span>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-8">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body">
+                <h5 class="card-title mb-4">Meu Progresso</h5>
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between mb-1">
+                        <span>Água</span>
+                        <span>{{ "%.1f"|format(metrics.water_score) }} pts</span>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar bg-info" role="progressbar" 
+                             style="width: {{ (metrics.water_score / 100 * 100)|int }}%" 
+                             aria-valuenow="{{ metrics.water_score }}" 
+                             aria-valuemin="0" 
+                             aria-valuemax="100"></div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between mb-1">
+                        <span>Energia</span>
+                        <span>{{ "%.1f"|format(metrics.energy_score) }} pts</span>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar bg-warning" role="progressbar" 
+                             style="width: {{ (metrics.energy_score / 100 * 100)|int }}%" 
+                             aria-valuenow="{{ metrics.energy_score }}" 
+                             aria-valuemin="0" 
+                             aria-valuemax="100"></div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between mb-1">
+                        <span>Mobilidade</span>
+                        <span>{{ "%.1f"|format(metrics.mobility_score) }} pts</span>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar bg-success" role="progressbar" 
+                             style="width: {{ (metrics.mobility_score / 100 * 100)|int }}%" 
+                             aria-valuenow="{{ metrics.mobility_score }}" 
+                             aria-valuemin="0" 
+                             aria-valuemax="100"></div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between mb-1">
+                        <span>Alimentação</span>
+                        <span>{{ "%.1f"|format(metrics.food_score) }} pts</span>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar bg-primary" role="progressbar" 
+                             style="width: {{ (metrics.food_score / 100 * 100)|int }}%" 
+                             aria-valuenow="{{ metrics.food_score }}" 
+                             aria-valuemin="0" 
+                             aria-valuemax="100"></div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between mb-1">
+                        <span>Resíduos</span>
+                        <span>{{ "%.1f"|format(metrics.waste_score) }} pts</span>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar bg-secondary" role="progressbar" 
+                             style="width: {{ (metrics.waste_score / 100 * 100)|int }}%" 
+                             aria-valuenow="{{ metrics.waste_score }}" 
+                             aria-valuemin="0" 
+                             aria-valuemax="100"></div>
+                    </div>
+                </div>
+                <div>
+                    <div class="d-flex justify-content-between mb-1">
+                        <span>Bem-estar</span>
+                        <span>{{ "%.1f"|format(metrics.wellbeing_score) }} pts</span>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar bg-danger" role="progressbar" 
+                             style="width: {{ (metrics.wellbeing_score / 100 * 100)|int }}%" 
+                             aria-valuenow="{{ metrics.wellbeing_score }}" 
+                             aria-valuemin="0" 
+                             aria-valuemax="100"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body text-center">
+                <h5 class="card-title mb-3">Pontuação Total</h5>
+                <div class="display-4 fw-bold text-success mb-3">{{ "%.0f"|format(metrics.total_score) }}</div>
+                <div class="mb-4">
+                    <span class="badge bg-success">Nível {{ metrics.level }}</span>
+                    <div class="progress mt-2">
+                        <div class="progress-bar bg-success" role="progressbar" 
+                             style="width: {{ (metrics.total_score % 100) }}%" 
+                             aria-valuenow="{{ metrics.total_score % 100 }}" 
+                             aria-valuemin="0" 
+                             aria-valuemax="100"></div>
+                    </div>
+                    <small class="text-muted">{{ metrics.total_score % 100 }}/100 para o próximo nível</small>
+                </div>
+                <div class="d-grid gap-2">
+                    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#logActivityModal">
+                        <i class="bi bi-plus-circle"></i> Registrar Atividade
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title mb-3">Esta Semana</h5>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span>Pontos Ganhos:</span>
+                    <span class="fw-bold">{{ weekly_points|int }} pts</span>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span>Atividades:</span>
+                    <span class="fw-bold">{{ recent_activities|length }}</span>
+                </div>
+                <div class="d-flex justify-content-between align-items-center">
+                    <span>Ranking:</span>
+                    <a href="{{ url_for('main.leaderboard') }}" class="btn btn-sm btn-outline-success">Ver Ranking</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="card-title mb-0">Atividades Recentes</h5>
+                    <a href="#" class="btn btn-sm btn-outline-success">Ver Todas</a>
+                </div>
+                {% if recent_activities %}
+                    {% for activity in recent_activities %}
+                    <div class="activity-item">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h6 class="mb-1">{{ activity.description }}</h6>
+                                <small class="text-muted">
+                                    <i class="bi bi-clock"></i> {{ activity.created_at.strftime('%d/%m/%Y %H:%M') }}
+                                </small>
+                            </div>
+                            <span class="badge bg-success">+{{ activity.points_earned }} pts</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="bi bi-activity fs-1 text-muted mb-3"></i>
+                        <p class="text-muted">Nenhuma atividade registrada ainda.</p>
+                        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#logActivityModal">
+                            <i class="bi bi-plus-circle"></i> Registrar Atividade
+                        </button>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Registro de Atividade -->
+<div class="modal fade" id="logActivityModal" tabindex="-1" aria-labelledby="logActivityModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="logActivityModalLabel">Registrar Nova Atividade</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body">
+                <form id="activityForm">
+                    <div class="mb-3">
+                        <label for="activityType" class="form-label">Tipo de Atividade</label>
+                        <select class="form-select" id="activityType" required>
+                            <option value="" selected disabled>Selecione uma opção</option>
+                            <option value="water_saved">Economia de Água</option>
+                            <option value="energy_saved">Economia de Energia</option>
+                            <option value="sustainable_transport">Transporte Sustentável</option>
+                            <option value="sustainable_food">Alimentação Sustentável</option>
+                            <option value="waste_reduction">Redução de Resíduos</option>
+                            <option value="physical_activity">Atividade Física</option>
+                            <option value="screen_time_reduction">Redução de Tempo de Tela</option>
+                            <option value="sleep_quality">Qualidade do Sono</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="activityDescription" class="form-label">Descrição</label>
+                        <input type="text" class="form-control" id="activityDescription" required 
+                               placeholder="Ex: Andei de bicicleta para o trabalho">
+                    </div>
+                    <div class="mb-3">
+                        <label for="activityPoints" class="form-label">Pontos</label>
+                        <input type="number" class="form-control" id="activityPoints" min="1" max="100" value="10" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-success" id="saveActivity">Salvar Atividade</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Configuração do modal de registro de atividade
+    const saveActivityBtn = document.getElementById('saveActivity');
+    
+    if (saveActivityBtn) {
+        saveActivityBtn.addEventListener('click', function() {
+            const activityType = document.getElementById('activityType').value;
+            const description = document.getElementById('activityDescription').value;
+            const points = parseFloat(document.getElementById('activityPoints').value);
+            
+            // Enviar dados para o servidor
+            fetch('{{ url_for("main.log_activity") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    activity_type: activityType,
+                    description: description,
+                    points: points
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    // Recarregar a página para atualizar os dados
+                    window.location.reload();
+                } else {
+                    alert('Erro ao salvar a atividade: ' + (data.error || 'Tente novamente mais tarde.'));
+                }
+            })
+            .catch(error => {
+                console.error('Erro:', error);
+                alert('Erro ao conectar ao servidor. Tente novamente.');
+            });
+        });
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}Entrar - Score Ambiental{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-4 p-md-5">
+                <div class="text-center mb-4">
+                    <h2 class="h4 fw-bold">Acesse sua conta</h2>
+                    <p class="text-muted">Entre para continuar no Score Ambiental</p>
+                </div>
+                
+                <form action="{{ url_for('auth.login') }}" method="post">
+                    {{ form.hidden_tag() }}
+                    
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Nome de usuário</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-person"></i></span>
+                            <input type="text" class="form-control" id="username" name="username" required>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <label for="password" class="form-label">Senha</label>
+                            <a href="#" class="small text-decoration-none">Esqueceu a senha?</a>
+                        </div>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                            <input type="password" class="form-control" id="password" name="password" required>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-success btn-lg">Entrar</button>
+                    </div>
+                </form>
+                
+                <div class="text-center mt-4">
+                    <p class="mb-0">Não tem uma conta? <a href="{{ url_for('auth.register') }}" class="text-success text-decoration-none">Cadastre-se</a></p>
+                </div>
+                
+                <div class="position-relative my-4">
+                    <hr>
+                    <div class="position-absolute top-50 start-50 translate-middle bg-white px-3 text-muted">ou</div>
+                </div>
+                
+                <div class="d-grid gap-2">
+                    <a href="#" class="btn btn-outline-secondary">
+                        <i class="bi bi-google me-2"></i> Entrar com Google
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="text-center mt-4">
+            <p class="text-muted small">Ao continuar, você concorda com nossos <a href="#" class="text-decoration-none">Termos de Uso</a> e <a href="#" class="text-decoration-none">Política de Privacidade</a>.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

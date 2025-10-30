@@ -1,0 +1,39 @@
+{
+  "nome": "Usuário",
+  "nivel": 1,
+  "pontuacao_total": 29,
+  "categorias": {
+    "Água": {
+      "pontos": 0,
+      "meta": 100
+    },
+    "Energia": {
+      "pontos": 0,
+      "meta": 100
+    },
+    "Mobilidade": {
+      "pontos": 0,
+      "meta": 100
+    },
+    "Alimentação": {
+      "pontos": 29,
+      "meta": 100
+    },
+    "Resíduos": {
+      "pontos": 0,
+      "meta": 100
+    },
+    "Bem-estar": {
+      "pontos": 0,
+      "meta": 100
+    }
+  },
+  "historico": [
+    {
+      "data": "28/10/2025 16:47",
+      "atividade": "Alimentação: comi uma maça",
+      "categoria": "Alimentação",
+      "pontos": 29
+    }
+  ]
+}

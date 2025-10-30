@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+
+{% block title %}Ranking - Score Ambiental{% endblock %}
+
+{% block extra_css %}
+<style>
+    .position-badge {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        color: white;
+        margin-right: 15px;
+    }
+    
+    .position-1 {
+        background: linear-gradient(135deg, #FFD700, #FFA500);
+        box-shadow: 0 4px 8px rgba(255, 215, 0, 0.3);
+    }
+    
+    .position-2 {
+        background: linear-gradient(135deg, #C0C0C0, #A9A9A9);
+        box-shadow: 0 4px 8px rgba(192, 192, 192, 0.3);
+    }
+    
+    .position-3 {
+        background: linear-gradient(135deg, #CD7F32, #A0522D);
+        box-shadow: 0 4px 8px rgba(205, 127, 50, 0.3);
+    }
+    
+    .position-other {
+        background-color: #f8f9fa;
+        color: #6c757d;
+        border: 1px solid #dee2e6;
+    }
+    
+    .user-card {
+        transition: transform 0.2s, box-shadow 0.2s;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+    
+    .user-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1) !important;
+    }
+    
+    .current-user {
+        border: 2px solid #198754;
+        background-color: rgba(25, 135, 84, 0.05);
+    }
+    
+    .medal {
+        font-size: 1.2rem;
+        margin-right: 5px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center mb-5">
+        <div class="col-lg-8">
+            <div class="text-center mb-5">
+                <h1 class="display-5 fw-bold text-success mb-3">Ranking de Pontuação</h1>
+                <p class="lead">Veja como você está em relação a outros usuários do Score Ambiental</p>
+                
+                <div class="card border-0 shadow-sm mt-4">
+                    <div class="card-body text-center py-4">
+                        <div class="d-flex align-items-center justify-content-center mb-3">
+                            <div class="position-badge bg-success">
+                                {{ user_position }}º
+                            </div>
+                            <div class="text-start">
+                                <h5 class="mb-0">Sua Posição</h5>
+                                <small class="text-muted">Continue praticando ações sustentáveis para subir no ranking!</small>
+                            </div>
+                        </div>
+                        <a href="{{ url_for('main.dashboard') }}" class="btn btn-outline-success">
+                            <i class="bi bi-arrow-left"></i> Voltar para o Painel
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0">Top 10 Usuários</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        {% for user in top_users %}
+                        <div class="list-group-item list-group-item-action p-0">
+                            <div class="d-flex align-items-center p-3 user-card {% if user.username == current_user.username %}current-user{% endif %}">
+                                <div class="position-badge {% if loop.index == 1 %}position-1{% elif loop.index == 2 %}position-2{% elif loop.index == 3 %}position-3{% else %}position-other{% endif %}">
+                                    {% if loop.index == 1 %}
+                                        <i class="bi bi-trophy-fill medal"></i>
+                                    {% elif loop.index == 2 %}
+                                        <i class="bi bi-award-fill medal"></i>
+                                    {% elif loop.index == 3 %}
+                                        <i class="bi bi-award-fill medal"></i>
+                                    {% else %}
+                                        {{ loop.index }}
+                                    {% endif %}
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="mb-0">{{ user.username }}</h6>
+                                            <small class="text-muted">Nível {{ user.level }}</small>
+                                        </div>
+                                        <div class="text-end">
+                                            <span class="badge bg-success rounded-pill">{{ "%.0f"|format(user.total_score) }} pts</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Como melhorar sua posição?</h5>
+                    <p class="card-text text-muted">Registre mais atividades sustentáveis para aumentar sua pontuação e subir no ranking.</p>
+                    <a href="{{ url_for('main.dashboard') }}" class="btn btn-success">
+                        <i class="bi bi-plus-circle"></i> Registrar Atividade
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
