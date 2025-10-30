@@ -7,55 +7,78 @@ from datetime import datetime, timedelta
 from tkinter import simpledialog
 
 # ========================
-# CONFIG
+# CONFIGURAÇÕES GERAIS
 # ========================
+
+# URL base da sua API (backend Flask/FastAPI/etc)
 API_BASE_URL = "http://localhost:5000/api"
 
+# Paleta de cores da interface.
+# Isso garante consistência visual e facilita manutenção de tema.
 COLORS = {
-    'primary': '#2C3E50',     # Azul escuro (cabeçalho)
-    'secondary': '#3498DB',   # Azul
-    'success': '#2ECC71',     # Verde
-    'danger': '#E74C3C',      # Vermelho
-    'warning': '#F39C12',     # Laranja
-    'light': '#ECF0F1',       # Cinza claro
-    'dark': '#2C3E50',        # Azul escuro
-    'white': '#FFFFFF',       # Branco
-    'background': '#F5F7FA',  # Cinza muito claro (fundo geral)
-    'text': '#2C3E50',        # Azul escuro (texto)
-    'border': '#BDC3C7'       # Cinza borda
+    'primary': '#2C3E50',     # Azul escuro (cabeçalho/topo)
+    'secondary': '#3498DB',   # Azul médio
+    'success': '#2ECC71',     # Verde (sucesso)
+    'danger': '#E74C3C',      # Vermelho (erro)
+    'warning': '#F39C12',     # Laranja (alerta)
+    'light': '#ECF0F1',       # Cinza claro / fundo claro
+    'dark': '#2C3E50',        # Azul escuro (sidebar)
+    'white': '#FFFFFF',       # Branco card
+    'background': '#F5F7FA',  # Cinza quase branco (fundo da tela)
+    'text': '#2C3E50',        # Azul escuro (texto padrão)
+    'border': '#BDC3C7'       # Cinza para borda
 }
 
 
 class ScoreAmbientalClient:
+    """
+    Essa classe é a aplicação inteira do lado do desktop (Tkinter).
+    Ela:
+    - controla login/cadastro
+    - renderiza todas as telas (dashboard, progresso, registro, ranking...)
+    - conversa com a API via requests
+    - guarda dados do usuário logado em self.usuario
+    """
+
     def __init__(self, root):
+        # Referência da janela principal do Tkinter
         self.root = root
-        self.usuario = None
-        self.usuario_id = None
+
+        # Dados do usuário logado:
+        self.usuario = None        # dict com dados completos do usuário
+        self.usuario_id = None     # ID único do usuário (token simples)
+
+        # Guarda qual tela está ativa (opcional, útil p/ navegação)
         self.current_screen = None
 
-        # Janela base
+        # Configuração inicial da janela
         self.root.title("EcoScore - Seu Score Ambiental")
         self.root.geometry("1000x700")
         self.root.minsize(900, 600)
         self.root.configure(bg=COLORS['background'])
 
-        # fonte padrão
+        # Define fonte padrão da interface
         self.default_font = font.nametofont("TkDefaultFont")
         self.default_font.configure(size=10)
 
-        # estilos
+        # Carrega estilos visuais (cores, botões, cards etc.)
         self.setup_styles()
 
-        # centraliza
+        # Centraliza a janela na tela
         self.center_window()
 
-        # tela inicial = login
+        # Primeira tela que o app mostra: login
         self.mostrar_tela_login()
 
     # -------------------------------------------------
-    # INFRA
+    # FUNÇÕES DE SUPORTE DE JANELA / ESTILO
     # -------------------------------------------------
+
     def center_window(self):
+        """
+        Centraliza a janela principal no centro da tela do usuário.
+        Visual mais profissional.
+        """
         self.root.update_idletasks()
         width = self.root.winfo_width()
         height = self.root.winfo_height()
@@ -64,39 +87,55 @@ class ScoreAmbientalClient:
         self.root.geometry(f'{width}x{height}+{x}+{y}')
 
     def limpar_tela(self):
+        """
+        Remove TODOS os widgets atuais da janela principal.
+        Isso é usado antes de desenhar cada tela.
+        """
         for widget in self.root.winfo_children():
             widget.destroy()
 
     def setup_styles(self):
+        """
+        Define o tema visual inteiro usando ttk.Style().
+        Aqui a gente configura:
+        - cores
+        - tamanhos
+        - estilos de botões/cards/texto
+        """
         style = ttk.Style()
         style.theme_use('default')
 
-        # geral
+        # Fonte padrão
         style.configure('.', font=('Segoe UI', 10))
 
-        # frames
+        # Frames básicos
         style.configure('TFrame', background=COLORS['background'])
 
+        # Barra do topo
         style.configure('Header.TFrame',
                         background=COLORS['primary'],
                         borderwidth=0)
 
+        # Sidebar à esquerda
         style.configure('Sidebar.TFrame',
                         background=COLORS['dark'])
 
+        # Área que envolve o conteúdo principal + sidebar
         style.configure('ContentOuter.TFrame',
                         background=COLORS['background'])
 
+        # Card branco (painel principal onde entra texto, métricas etc.)
         style.configure('Card.TFrame',
                         background='white',
                         borderwidth=0,
                         relief='flat')
 
+        # Rodapé azul escuro
         style.configure('Footer.TFrame',
                         background=COLORS['primary'],
                         height=40)
 
-        # labels
+        # Tipos de textos/títulos
         style.configure('Title.TLabel',
                         font=('Segoe UI', 20, 'bold'),
                         background=COLORS['primary'],
@@ -162,13 +201,14 @@ class ScoreAmbientalClient:
                         background='white',
                         foreground=COLORS['dark'])
 
-        # botões
+        # Botões padrão
         style.configure('TButton',
                         font=('Segoe UI', 10),
                         padding=10,
                         relief='flat',
                         borderwidth=0)
 
+        # Botão de ação principal (verde)
         style.configure('Accent.TButton',
                         background=COLORS['success'],
                         foreground='white')
@@ -176,6 +216,7 @@ class ScoreAmbientalClient:
                   background=[('active', '#25a25a'), ('pressed', '#1e8c4f')],
                   foreground=[('disabled', '#a0a0a0')])
 
+        # Botão secundário (cinza claro)
         style.configure('Secondary.TButton',
                         background=COLORS['light'],
                         foreground=COLORS['dark'])
@@ -183,6 +224,7 @@ class ScoreAmbientalClient:
                   background=[('active', '#e0e0e0'), ('pressed', '#d0d0d0')],
                   foreground=[('disabled', '#a0a0a0')])
 
+        # Botões da sidebar (navegação)
         style.configure('Nav.TButton',
                         anchor='w',
                         padding=(15, 10),
@@ -195,7 +237,7 @@ class ScoreAmbientalClient:
                               ('pressed', '#1e2a36')],
                   foreground=[('disabled', '#888888')])
 
-        # entry / combobox
+        # Campos de texto e combobox
         style.configure('TEntry',
                         fieldbackground='white',
                         borderwidth=1,
@@ -207,30 +249,30 @@ class ScoreAmbientalClient:
                         borderwidth=1,
                         relief='solid')
 
-        # scrollbar
+        # Scrollbar
         style.configure('TScrollbar',
                         background=COLORS['light'],
                         arrowsize=15,
                         borderwidth=0)
 
-        # progressbar
+        # Barra de progresso (usada no "Meu Progresso")
         style.configure('TProgressbar',
                         background=COLORS['success'],
                         troughcolor=COLORS['light'],
                         borderwidth=0)
 
-        # barra colorida embaixo dos cards
+        # Barrinha colorida no pé de cada card de métrica
         style.configure('ColorBar.TFrame',
                         background=COLORS['primary'])
 
-        # opções extras para listas
+        # Aparência da lista aberta do Combobox
         self.root.option_add('*TCombobox*Listbox.font', ('Segoe UI', 10))
         self.root.option_add('*TCombobox*Listbox.background', 'white')
         self.root.option_add('*TCombobox*Listbox.foreground', COLORS['text'])
         self.root.option_add('*TCombobox*Listbox.selectBackground', COLORS['secondary'])
         self.root.option_add('*TCombobox*Listbox.selectForeground', 'white')
 
-        # estilo para Text widget
+        # Estilo padrão pro widget Text()
         text_style = {
             'background': 'white',
             'foreground': COLORS['text'],
@@ -239,14 +281,28 @@ class ScoreAmbientalClient:
         for key, value in text_style.items():
             self.root.option_add(f'*Text*{key}', value)
 
+    # -------------------------------------------------
+    # COMUNICAÇÃO COM A API (BACKEND)
+    # -------------------------------------------------
+
     def fazer_requisicao(self, metodo, endpoint, dados=None, auth_required=True):
+        """
+        Essa função centraliza TODAS as chamadas HTTP.
+        - metodo: 'GET', 'POST', 'PUT'
+        - endpoint: ex '/login', '/usuarios/<id>'
+        - dados: corpo JSON em POST/PUT
+        - auth_required: se True, manda Authorization com o ID do usuário
+
+        Ela também faz prints de debug antes e depois da requisição.
+        """
         headers = {}
         if auth_required and self.usuario_id:
+            # Aqui usamos o próprio user_id como "token" simples
             headers['Authorization'] = f"Bearer {self.usuario_id}"
 
         url = f"{API_BASE_URL}{endpoint}"
 
-        # DEBUG antes da request
+        # DEBUG - mostra requisição no terminal
         print("=== REQUISIÇÃO ===")
         print("Método :", metodo)
         print("URL    :", url)
@@ -255,6 +311,7 @@ class ScoreAmbientalClient:
         print("==================")
 
         try:
+            # Escolhe método HTTP
             if metodo == 'GET':
                 response = requests.get(url, headers=headers)
             elif metodo == 'POST':
@@ -264,25 +321,30 @@ class ScoreAmbientalClient:
             else:
                 raise ValueError(f"Método {metodo} não suportado")
 
-            # DEBUG depois da resposta
+            # DEBUG - mostra resposta no terminal
             print("=== RESPOSTA ===")
             print("Status code:", response.status_code)
             print("Texto bruto :", response.text)
             print("================")
 
+            # Se foi 2xx, tentamos ler JSON
             if 200 <= response.status_code < 300:
                 if response.text.strip():
                     try:
                         return response.json()
                     except ValueError:
+                        # Retorno 2xx mas não é JSON válido
                         print("⚠ Resposta 2xx mas não é JSON parseável.")
                         return {}
+                # Sem corpo
                 return {}
             else:
+                # Status de erro -> mostra popup
                 messagebox.showerror("Erro", f"Erro na requisição: {response.text}")
                 return None
 
         except requests.exceptions.RequestException as e:
+            # Erro de conexão com o servidor
             print("XXX EXCEPTION XXX")
             print(e)
             messagebox.showerror("Erro de Conexão",
@@ -290,17 +352,22 @@ class ScoreAmbientalClient:
             return None
 
     def fazer_logout(self):
+        """
+        Reseta dados locais de usuário e volta pra tela de login.
+        """
         self.usuario = None
         self.usuario_id = None
         self.mostrar_tela_login()
 
     # -------------------------------------------------
-    # LÓGICA DE PONTOS
+    # LÓGICA DE PONTOS / NÍVEL
     # -------------------------------------------------
+
     def calcular_pontos_para_proximo_nivel(self):
         """
-        Cada nível exige nível*100 pontos totais.
-        Usa pontuacao_total que vem da API.
+        Calcula quantos pontos faltam pra subir de nível.
+        Regra: cada nível exige (nivel_atual * 100) pontos totais.
+        Usa self.usuario['pontuacao_total'] que vem da API.
         """
         nivel_atual = self.usuario.get('nivel', 1)
         pontos_totais = self.usuario.get('pontuacao_total', 0)
@@ -309,18 +376,24 @@ class ScoreAmbientalClient:
         return faltam
 
     # -------------------------------------------------
-    # ESTATÍSTICAS DO USUÁRIO
+    # CÁLCULO DE ESTATÍSTICAS (para tela Estatísticas)
     # -------------------------------------------------
+
     def calcular_estatisticas_usuario(self):
         """
-        Lê self.usuario (pegando /usuarios/<id>) e gera métricas:
-        - pontos_hoje
-        - pontos_7dias
-        - media_pontos_por_atividade
-        - categoria_top (categoria que mais somou pontos no total)
-        - ultimas_atividades (lista das últimas 10)
+        Monta estatísticas do usuário baseado no histórico de atividades.
+
+        Retorna um dicionário:
+        - pontos_hoje: soma só de hoje
+        - pontos_7dias: soma dos últimos 7 dias
+        - media_pontos: média de pontos por atividade
+        - categoria_top: categoria que mais pontuou no total
+        - ultimas_atividades: últimas 10 atividades ordenadas desc
+
+        OBS: Antes de calcular, atualiza self.usuario consultando a API
+        /usuarios/<id>.
         """
-        # garantir dados atualizados
+        # Atualiza dados do usuário pegando versão mais recente da API
         dados = self.fazer_requisicao('GET', f'/usuarios/{self.usuario_id}')
         if dados:
             self.usuario = dados
@@ -329,13 +402,13 @@ class ScoreAmbientalClient:
         if not isinstance(historico, list):
             historico = []
 
-        # normalizar datas pra datetime real
+        # Função interna pra converter string de data pra datetime
         def parse_dt(dt_str):
-            # tenta ISO: "2025-10-30T15:33:58.639381"
+            # Tenta ISO completo, ex: 2025-10-30T15:33:58.639381
             try:
                 return datetime.fromisoformat(dt_str)
             except Exception:
-                # fallback se vier "dd/mm/YYYY HH:MM"
+                # Fallback pra formato "dd/mm/YYYY HH:MM"
                 try:
                     return datetime.strptime(dt_str, "%d/%m/%Y %H:%M")
                 except Exception:
@@ -351,7 +424,7 @@ class ScoreAmbientalClient:
         total_atividades = 0
         pontos_por_categoria = {}
 
-        # ordenar histórico mais recente primeiro
+        # Ordena histórico do mais recente pro mais antigo
         historico_ordenado = sorted(
             historico,
             key=lambda x: x.get('data', ''),
@@ -367,28 +440,29 @@ class ScoreAmbientalClient:
             soma_pontos_total += pts
             total_atividades += 1
 
-            # conta por categoria
+            # Agrupa pontuação por categoria
             pontos_por_categoria[cat] = pontos_por_categoria.get(cat, 0) + pts
 
+            # Se a data é válida, conta no "hoje" e "7 dias"
             if dt:
                 if dt.date() == hoje_data:
                     pontos_hoje += pts
                 if dt >= sete_dias_atras:
                     pontos_7dias += pts
 
-        # média
+        # Média de pontos por atividade
         if total_atividades > 0:
             media_pontos = soma_pontos_total / total_atividades
         else:
             media_pontos = 0
 
-        # top categoria
+        # Categoria com mais pontos acumulados
         if pontos_por_categoria:
             categoria_top = max(pontos_por_categoria, key=pontos_por_categoria.get)
         else:
             categoria_top = "—"
 
-        # últimas 10 atividades
+        # Últimas 10 atividades
         ultimas_atividades = historico_ordenado[:10]
 
         return {
@@ -400,33 +474,40 @@ class ScoreAmbientalClient:
         }
 
     # -------------------------------------------------
-    # COMPONENTES DE INTERFACE (REUSO)
+    # COMPONENTES DE UI REUTILIZÁVEIS
     # -------------------------------------------------
+
     def montar_layout_base(self, titulo_header):
         """
-        Cria header, sidebar e área principal.
-        Retorna (content_frame) onde a tela específica vai desenhar.
+        Monta a estrutura padrão da tela:
+        - header superior (azul escuro)
+        - sidebar lateral com botões de navegação
+        - área branca principal (content)
+
+        Retorna: o frame 'content' onde a tela específica vai desenhar coisas.
         """
+        # limpa tela antes
         self.limpar_tela()
 
-        # HEADER
+        # HEADER (barra do topo com título da tela)
         header = ttk.Frame(self.root, style='Header.TFrame')
         header.pack(fill='x')
         ttk.Label(header,
                   text=titulo_header,
                   style='Title.TLabel').pack(pady=15)
 
-        # ÁREA PRINCIPAL (sidebar + conteúdo)
+        # FRAME PRINCIPAL (sidebar + conteúdo)
         main_frame = ttk.Frame(self.root, style='ContentOuter.TFrame')
         main_frame.pack(expand=True, fill='both', padx=20, pady=10)
 
-        # SIDEBAR
+        # SIDEBAR LATERAL
         sidebar = ttk.Frame(main_frame, style='Sidebar.TFrame', width=200)
         sidebar.pack(side='left', fill='y', padx=(0, 20))
 
         nav_frame = ttk.Frame(sidebar, style='Sidebar.TFrame')
         nav_frame.pack(fill='x', padx=10, pady=10)
 
+        # Botões da navegação lateral
         botoes_nav = [
             ("🏠 Início", self.mostrar_tela_principal),
             ("📝 Registrar Atividade", self.mostrar_tela_registro),
@@ -443,43 +524,48 @@ class ScoreAmbientalClient:
                        style='Nav.TButton',
                        command=comando).pack(fill='x', pady=2, ipady=8)
 
-        # CONTEÚDO (card branco grande)
+        # ÁREA DE CONTEÚDO PRINCIPAL (card branco grande)
         content = ttk.Frame(main_frame, style='Card.TFrame')
         content.pack(expand=True, fill='both')
 
         return content
 
     def criar_metric_card(self, parent, title, value, subtitle, color_hex):
+        """
+        Cria um card pequeno de métrica (título, valor grande, subtítulo).
+        Usado no dashboard e na tela Estatísticas.
+        """
         card = ttk.Frame(parent, style='Card.TFrame')
         card.pack(side='left', expand=True, fill='both', padx=5, pady=5)
 
-        # título
         ttk.Label(card,
                   text=title,
                   style='CardTitle.TLabel',
                   foreground=color_hex,
                   background='white').pack(anchor='w', padx=15, pady=(15, 5))
 
-        # valor
         ttk.Label(card,
                   text=value,
                   style='MetricValue.TLabel',
                   foreground=color_hex,
                   background='white').pack(anchor='w', padx=15, pady=5)
 
-        # subtítulo
         ttk.Label(card,
                   text=subtitle,
                   style='Subtitle.TLabel',
                   background='white').pack(anchor='w', padx=15, pady=(0, 15))
 
-        # barra de destaque
+        # Barrinha de cor no rodapé do card
         bar = ttk.Frame(card, style='ColorBar.TFrame', height=4)
         bar.pack(side='bottom', fill='x')
 
         return card
 
     def bloc_atividades_recentes(self, parent, limit=5):
+        """
+        Bloco que mostra uma lista das atividades mais recentes do usuário
+        (dentro da Home/dashboard).
+        """
         bloco = ttk.Frame(parent, style='Card.TFrame')
         bloco.pack(fill='both', expand=True, padx=10, pady=10)
 
@@ -487,12 +573,15 @@ class ScoreAmbientalClient:
                   text="📅 Atividades Recentes",
                   style='SectionTitle.TLabel').pack(anchor='w', pady=(10, 5), padx=10)
 
+        # A API pode mandar 'historico' (lista de atividades)
+        # ou 'atividades' dependendo de como você estruturou
         atividades = []
         if self.usuario and self.usuario.get('atividades'):
             atividades = self.usuario.get('atividades', [])
         elif self.usuario and self.usuario.get('historico'):
             atividades = self.usuario.get('historico', [])
 
+        # Se não tem nada ainda
         if not atividades:
             ttk.Label(bloco,
                       text="Nenhuma atividade registrada ainda.",
@@ -500,15 +589,17 @@ class ScoreAmbientalClient:
                       background='white').pack(pady=20, padx=10, anchor='w')
             return bloco
 
-        # mais recente primeiro
+        # Ordena mais recentes primeiro e limita
         atividades_ordenadas = sorted(
             atividades,
             key=lambda x: x.get('data', ''),
             reverse=True
         )[:limit]
 
+        # Monta linha a linha
         for atv in atividades_ordenadas:
             data_iso = atv.get('data', '')
+            # só mostra AAAA-MM-DD
             data_fmt = data_iso.split('T')[0] if 'T' in data_iso else data_iso
 
             desc = atv.get('descricao', 'Sem descrição')
@@ -541,8 +632,12 @@ class ScoreAmbientalClient:
     # TELAS
     # -------------------------------------------------
 
-    # LOGIN
+    # LOGIN -------------------------------------------
     def mostrar_tela_login(self):
+        """
+        Tela inicial do app.
+        Faz login com email/senha e manda requisição POST /login.
+        """
         self.limpar_tela()
 
         main_frame = ttk.Frame(self.root, style='Card.TFrame')
@@ -556,14 +651,14 @@ class ScoreAmbientalClient:
         form_frame = ttk.Frame(main_frame, style='Card.TFrame')
         form_frame.pack(padx=40, pady=10, fill='x')
 
-        # Email
+        # Campo: Email
         ttk.Label(form_frame, text="Email", style='FormLabel.TLabel').grid(
             row=0, column=0, pady=(0, 5), sticky='w')
         email_var = tk.StringVar()
         email_entry = ttk.Entry(form_frame, textvariable=email_var, width=40)
         email_entry.grid(row=1, column=0, pady=(0, 20), ipady=8)
 
-        # Senha
+        # Campo: Senha
         ttk.Label(form_frame, text="Senha", style='FormLabel.TLabel').grid(
             row=2, column=0, pady=(0, 5), sticky='w')
         senha_var = tk.StringVar()
@@ -573,12 +668,14 @@ class ScoreAmbientalClient:
         btns = ttk.Frame(form_frame, style='Card.TFrame')
         btns.grid(row=4, column=0, pady=(10, 20))
 
+        # Botão "Entrar"
         ttk.Button(btns,
                    text="Entrar",
                    style='Accent.TButton',
                    command=lambda: self.fazer_login(email_var.get(), senha_var.get())
                    ).pack(side='left', padx=5, ipadx=20)
 
+        # Botão "Criar Conta"
         ttk.Button(btns,
                    text="Criar Conta",
                    style='Secondary.TButton',
@@ -593,10 +690,19 @@ class ScoreAmbientalClient:
 
         email_entry.focus()
 
+        # Enter no teclado também tenta logar
         for widget in [email_entry, senha_entry]:
             widget.bind('<Return>', lambda e: self.fazer_login(email_var.get(), senha_var.get()))
 
     def fazer_login(self, email, senha):
+        """
+        Dispara POST /login com email e senha.
+        Se sucesso:
+          - salva self.usuario_id e self.usuario
+          - mostra o dashboard principal
+        Se falha:
+          - mostra popup de erro
+        """
         if not email or not senha:
             messagebox.showwarning("Atenção", "Por favor, preencha todos os campos.")
             return
@@ -605,14 +711,19 @@ class ScoreAmbientalClient:
         response = self.fazer_requisicao('POST', '/login', dados, auth_required=False)
 
         if response and response.get('sucesso'):
+            # API precisa devolver: {sucesso: True, usuario_id: "...", usuario: {...}}
             self.usuario_id = response.get('usuario_id')
             self.usuario = response.get('usuario', {})
             self.mostrar_tela_principal()
         else:
             messagebox.showerror("Erro de Login", "Email ou senha inválidos.")
 
-    # CADASTRO
+    # CADASTRO ----------------------------------------
     def mostrar_tela_cadastro(self):
+        """
+        Tela de cadastro de novo usuário.
+        Faz POST /cadastrar depois de validar os campos.
+        """
         self.limpar_tela()
 
         main_frame = ttk.Frame(self.root, style='Card.TFrame')
@@ -634,7 +745,7 @@ class ScoreAmbientalClient:
         nome_entry = ttk.Entry(form_frame, textvariable=nome_var, width=40)
         nome_entry.grid(row=1, column=0, pady=(0, 15), ipady=8)
 
-        # Email
+        # E-mail
         ttk.Label(form_frame, text="E-mail", style='FormLabel.TLabel').grid(
             row=2, column=0, pady=(0, 5), sticky='w')
         email_var = tk.StringVar()
@@ -648,7 +759,7 @@ class ScoreAmbientalClient:
         senha_entry = ttk.Entry(form_frame, textvariable=senha_var, show="•", width=40)
         senha_entry.grid(row=5, column=0, pady=(0, 15), ipady=8)
 
-        # Confirmar Senha
+        # Confirmar senha
         ttk.Label(form_frame, text="Confirmar Senha", style='FormLabel.TLabel').grid(
             row=6, column=0, pady=(0, 5), sticky='w')
         confirmar_senha_var = tk.StringVar()
@@ -656,6 +767,10 @@ class ScoreAmbientalClient:
         confirmar_senha_entry.grid(row=7, column=0, pady=(0, 20), ipady=8)
 
         def cadastrar():
+            """
+            Valida os campos e chama POST /cadastrar.
+            Se sucesso, volta pra tela de login.
+            """
             nome = nome_var.get().strip()
             email = email_var.get().strip()
             senha = senha_var.get()
@@ -678,6 +793,7 @@ class ScoreAmbientalClient:
             else:
                 messagebox.showerror("Erro", "Falha ao cadastrar. Tente novamente.")
 
+        # Botões de ação
         btn_frame = ttk.Frame(form_frame, style='Card.TFrame')
         btn_frame.grid(row=8, column=0, pady=(10, 20))
 
@@ -693,11 +809,20 @@ class ScoreAmbientalClient:
 
         nome_entry.focus()
 
+        # Enter em qualquer campo tenta cadastrar
         for widget in [nome_entry, email_entry, senha_entry, confirmar_senha_entry]:
             widget.bind('<Return>', lambda e: cadastrar())
 
-    # DASHBOARD PRINCIPAL
+    # DASHBOARD PRINCIPAL -----------------------------
     def mostrar_tela_principal(self):
+        """
+        Tela 'Home' depois do login.
+        Mostra:
+        - Boas vindas
+        - Métricas básicas (pontuação total / nível / quanto falta p/ próximo nível)
+        - Atividades recentes
+        - Rodapé
+        """
         content = self.montar_layout_base("🌱 Meu Score Ambiental")
 
         # Boas-vindas
@@ -714,7 +839,7 @@ class ScoreAmbientalClient:
                   style='Text.TLabel',
                   background='white').pack(anchor='w', padx=10, pady=(0, 10))
 
-        # Métricas
+        # Métricas principais
         metrics_frame = ttk.Frame(content, style='Card.TFrame')
         metrics_frame.pack(fill='x', padx=10, pady=10)
 
@@ -729,6 +854,7 @@ class ScoreAmbientalClient:
         nivel_atual = self.usuario.get('nivel', 1)
         faltam = self.calcular_pontos_para_proximo_nivel()
 
+        # Card: Pontuação Total
         self.criar_metric_card(
             metrics_row,
             "Pontuação Total",
@@ -737,6 +863,7 @@ class ScoreAmbientalClient:
             COLORS['primary']
         )
 
+        # Card: Nível Atual
         self.criar_metric_card(
             metrics_row,
             "Nível Atual",
@@ -745,6 +872,7 @@ class ScoreAmbientalClient:
             COLORS['secondary']
         )
 
+        # Card: Quanto falta pro próximo nível
         self.criar_metric_card(
             metrics_row,
             "Próximo Nível",
@@ -753,18 +881,23 @@ class ScoreAmbientalClient:
             COLORS['success']
         )
 
-        # Atividades Recentes
+        # Bloco de atividades recentes
         self.bloc_atividades_recentes(content, limit=5)
 
-        # Rodapé
+        # Rodapé fixo embaixo
         footer = ttk.Frame(self.root, style='Footer.TFrame')
         footer.pack(side='bottom', fill='x')
         ttk.Label(footer,
                   text="© 2025 EcoScore - Todos os direitos reservados",
                   style='Footer.TLabel').pack(pady=5)
 
-    # REGISTRAR ATIVIDADE
+    # REGISTRAR ATIVIDADE ----------------------------
     def mostrar_tela_registro(self):
+        """
+        Tela para criar uma nova atividade e mandar pro backend.
+        Faz POST /usuarios/<id>/atividades
+        e depois atualiza os dados do usuário.
+        """
         content = self.montar_layout_base("📝 Registrar Atividade")
 
         form_frame = ttk.Frame(content, style='Card.TFrame')
@@ -775,7 +908,7 @@ class ScoreAmbientalClient:
                   style='SectionTitle.TLabel').grid(
             row=0, column=0, columnspan=2, pady=(0, 20), sticky='w')
 
-        # Categoria
+        # Campo: Categoria da atividade
         ttk.Label(form_frame,
                   text="Categoria:",
                   style='FormLabel.TLabel').grid(
@@ -798,7 +931,7 @@ class ScoreAmbientalClient:
         categoria_combo.grid(row=1, column=1, pady=5, sticky='w')
         categoria_combo.current(0)
 
-        # Descrição
+        # Campo: Descrição livre
         ttk.Label(form_frame,
                   text="Descrição:",
                   style='FormLabel.TLabel').grid(
@@ -811,7 +944,7 @@ class ScoreAmbientalClient:
                                  font=('Segoe UI', 10))
         descricao_text.grid(row=2, column=1, pady=5, sticky='ew')
 
-        # Pontuação estimada
+        # Campo "Pontuação estimada"
         ttk.Label(form_frame,
                   text="Pontuação estimada:",
                   style='FormLabel.TLabel').grid(
@@ -824,7 +957,14 @@ class ScoreAmbientalClient:
                                  background='white')
         pontos_label.grid(row=3, column=1, pady=5, sticky='w')
 
+        # Função local: gera pontuação com base em descrição+categoria
         def calcular_pontuacao_descricao(descricao, categoria):
+            """
+            Regrinha simples para gerar pontos:
+            - 2 pontos por palavra digitada
+            - bônus dependendo da categoria
+            - mínimo 1 e máximo 50
+            """
             PONTOS_POR_PALAVRA = 2
             BONUS_POR_CATEGORIA = {
                 'reciclagem': 5,
@@ -840,6 +980,7 @@ class ScoreAmbientalClient:
             pontos_local = max(1, min(pontos_local, 50))
             return pontos_local
 
+        # Atualiza label de pontos em tempo real
         def atualizar_pontuacao(event=None):
             descricao = descricao_text.get("1.0", tk.END).strip()
             categoria = categoria_var.get()
@@ -854,15 +995,20 @@ class ScoreAmbientalClient:
         descricao_text.bind('<KeyRelease>', atualizar_pontuacao)
         categoria_combo.bind('<<ComboboxSelected>>', atualizar_pontuacao)
 
-        # Botões
+        # Botões Salvar / Cancelar
         btn_frame = ttk.Frame(form_frame, style='Card.TFrame')
         btn_frame.grid(row=4, column=0, columnspan=2, pady=(20, 0))
 
         def salvar_atividade():
+            """
+            Monta o objeto da atividade e envia pro backend.
+            Depois atualiza o usuário e volta pro dashboard.
+            """
             descricao = descricao_text.get("1.0", tk.END).strip()
             categoria = categoria_var.get()
             pontos = int(pontos_var.get()) if pontos_var.get().isdigit() else 0
 
+            # Valida
             if not descricao or not categoria:
                 messagebox.showwarning("Atenção", "Por favor, preencha todos os campos.")
                 return
@@ -877,12 +1023,14 @@ class ScoreAmbientalClient:
                 'data': datetime.now().isoformat()
             }
 
+            # POST /usuarios/<id>/atividades
             resposta = self.fazer_requisicao('POST',
                                              f'/usuarios/{self.usuario_id}/atividades',
                                              dados)
 
+            # Se a API devolveu um objeto com 'id', assumimos sucesso
             if resposta and resposta.get('id'):
-                # atualiza usuário
+                # Atualiza dados do usuário localmente
                 user_atualizado = self.fazer_requisicao('GET', f'/usuarios/{self.usuario_id}')
                 if user_atualizado:
                     self.usuario = user_atualizado
@@ -893,6 +1041,7 @@ class ScoreAmbientalClient:
                 )
                 self.mostrar_tela_principal()
             else:
+                # Falha: alertar usuário mas instruir a olhar terminal (onde tem debug)
                 messagebox.showerror(
                     "Erro",
                     "Não foi possível registrar a atividade. Veja o terminal para detalhes."
@@ -908,13 +1057,21 @@ class ScoreAmbientalClient:
                    style='Secondary.TButton',
                    command=self.mostrar_tela_principal).pack(side='left', padx=5, ipadx=20)
 
+        # Calcula pontuação inicial (caso já tenha texto pré-preenchido)
         atualizar_pontuacao()
 
-    # MEU PROGRESSO
+    # MEU PROGRESSO ----------------------------------
     def mostrar_meu_progresso(self):
+        """
+        Tela que mostra barras de progresso por categoria:
+        Ex: Água 42/100 (42%)
+        A API precisa mandar self.usuario['categorias'] = {
+            'Água': {'pontos': 42, 'meta': 100, ...}, ...
+        }
+        """
         content = self.montar_layout_base("📊 Meu Progresso")
 
-        # pega usuário atualizado
+        # Garante dados atualizados antes de exibir
         resposta = self.fazer_requisicao('GET', f'/usuarios/{self.usuario_id}')
         if resposta:
             self.usuario = resposta
@@ -928,6 +1085,7 @@ class ScoreAmbientalClient:
 
         categorias_user = self.usuario.get('categorias', {})
 
+        # Grid com nome da categoria, barra, e texto "42/100 (42.0%)"
         grid_frame = ttk.Frame(frame_progresso, style='Card.TFrame')
         grid_frame.pack(fill='x')
 
@@ -937,12 +1095,14 @@ class ScoreAmbientalClient:
             progresso = (pontos / meta) * 100 if meta > 0 else 0
             progresso = min(100, progresso)
 
+            # Nome da categoria
             ttk.Label(grid_frame,
                       text=categoria,
                       style='Text.TLabel',
                       background='white',
                       width=20).grid(row=i, column=0, pady=5, sticky='w')
 
+            # Barra de progresso personalizada por categoria
             style_temp = ttk.Style()
             style_name = f"{categoria}.Horizontal.TProgressbar"
             style_temp.configure(style_name,
@@ -957,19 +1117,30 @@ class ScoreAmbientalClient:
             pb['value'] = progresso
             pb.grid(row=i, column=1, padx=10, pady=5, sticky='w')
 
+            # Texto ao lado da barra
             ttk.Label(grid_frame,
                       text=f"{pontos}/{meta} ({progresso:.1f}%)",
                       style='Text.TLabel',
                       background='white',
                       width=20).grid(row=i, column=2, padx=5, pady=5, sticky='w')
 
-    # ESTATÍSTICAS (AGORA FUNCIONA)
+    # ESTATÍSTICAS -----------------------------------
     def mostrar_estatisticas(self):
+        """
+        Tela 'Estatísticas'.
+        Mostra:
+        - Pontos de hoje
+        - Pontos últimos 7 dias
+        - Média de pontos por atividade
+        - Categoria que mais pontuou
+        - Tabela das últimas atividades
+        """
         content = self.montar_layout_base("📈 Estatísticas")
 
+        # Calcula estatísticas (isso já consulta a API p/ atualizar self.usuario)
         stats = self.calcular_estatisticas_usuario()
 
-        # Bloco resumo (cards de métricas)
+        # ---- Bloco Resumo (cards)
         metrics_frame = ttk.Frame(content, style='Card.TFrame')
         metrics_frame.pack(fill='x', padx=20, pady=(20, 10))
 
@@ -980,6 +1151,7 @@ class ScoreAmbientalClient:
         metrics_row = ttk.Frame(metrics_frame, style='Card.TFrame')
         metrics_row.pack(fill='x', padx=10, pady=(0, 10))
 
+        # Card: Pontos Hoje
         self.criar_metric_card(
             metrics_row,
             "Pontos Hoje",
@@ -988,6 +1160,7 @@ class ScoreAmbientalClient:
             COLORS['primary']
         )
 
+        # Card: Últimos 7 dias
         self.criar_metric_card(
             metrics_row,
             "Últimos 7 dias",
@@ -996,6 +1169,7 @@ class ScoreAmbientalClient:
             COLORS['secondary']
         )
 
+        # Card: Média por Atividade
         self.criar_metric_card(
             metrics_row,
             "Média / Atividade",
@@ -1004,7 +1178,7 @@ class ScoreAmbientalClient:
             COLORS['success']
         )
 
-        # Categoria destaque
+        # ---- Bloco Categoria destaque
         destaque_frame = ttk.Frame(content, style='Card.TFrame')
         destaque_frame.pack(fill='x', padx=20, pady=(10, 10))
 
@@ -1018,7 +1192,7 @@ class ScoreAmbientalClient:
                   foreground=COLORS['warning'],
                   background='white').pack(anchor='w', padx=20, pady=(0, 15))
 
-        # Lista das últimas atividades
+        # ---- Bloco Últimas atividades (tabelinha)
         ult_frame = ttk.Frame(content, style='Card.TFrame')
         ult_frame.pack(fill='both', expand=True, padx=20, pady=(10, 20))
 
@@ -1027,12 +1201,13 @@ class ScoreAmbientalClient:
                   style='SectionTitle.TLabel').pack(anchor='w', pady=(10, 5), padx=10)
 
         if not stats['ultimas_atividades']:
+            # Caso o usuário ainda não tenha atividades
             ttk.Label(ult_frame,
                       text="Nenhuma atividade registrada ainda.",
                       style='Text.TLabel',
                       background='white').pack(anchor='w', padx=20, pady=(0, 10))
         else:
-            # cabeçalho
+            # Cabeçalho da tabela
             header_row = ttk.Frame(ult_frame, style='Card.TFrame')
             header_row.pack(fill='x', padx=15, pady=(0, 5))
 
@@ -1045,13 +1220,15 @@ class ScoreAmbientalClient:
             ttk.Label(header_row, text="Pontos", style='FormLabel.TLabel',
                       background='white', width=10).grid(row=0, column=3, sticky='e')
 
-            # linhas
+            # Linhas da tabela
             for i, atv in enumerate(stats['ultimas_atividades'], start=1):
                 linha = ttk.Frame(ult_frame, style='Card.TFrame')
                 linha.pack(fill='x', padx=15, pady=2)
 
                 data_raw = atv.get('data', '')
+                # Formata a data pra ficar mais amigável visualmente
                 if "T" in data_raw:
+                    # "2025-10-30T15:33:58.639381" -> "2025-10-30 15:33:58"
                     data_fmt = data_raw.replace("T", " ").split(".")[0]
                 else:
                     data_fmt = data_raw
@@ -1065,8 +1242,12 @@ class ScoreAmbientalClient:
                 tk.Label(linha, text=desc, anchor='w', width=40, bg='white', justify='left', wraplength=400).grid(row=0, column=2, sticky='w')
                 tk.Label(linha, text=str(pts), anchor='e', width=10, bg='white').grid(row=0, column=3, sticky='e')
 
-    # CONFIGURAÇÕES
+    # CONFIGURAÇÕES ----------------------------------
     def mostrar_configuracoes(self):
+        """
+        Tela de configurações de conta (placeholder ainda).
+        Por enquanto só mostra um texto e um botão de logout.
+        """
         content = self.montar_layout_base("⚙️ Configurações")
 
         bloco = ttk.Frame(content, style='Card.TFrame')
@@ -1086,15 +1267,24 @@ class ScoreAmbientalClient:
                    style='Secondary.TButton',
                    command=self.fazer_logout).pack(anchor='w', padx=10, pady=(20, 0))
 
-    # RANKING
+    # RANKING ----------------------------------------
     def mostrar_ranking(self):
+        """
+        Tela de ranking geral.
+        Busca GET /ranking na API e lista:
+        - posição
+        - nome
+        - nível
+        - pontuação total
+        Também destaca o usuário atual em azul claro.
+        """
         content = self.montar_layout_base("🏆 Ranking")
 
         ttk.Label(content,
                   text="Ranking de Usuários",
                   style='SectionTitle.TLabel').pack(anchor='w', pady=(20, 10), padx=20)
 
-        # busca ranking via API
+        # Puxa ranking da API
         resposta = self.fazer_requisicao('GET', '/ranking')
         if not resposta:
             ttk.Label(content,
@@ -1103,7 +1293,7 @@ class ScoreAmbientalClient:
                       background='white').pack(anchor='w', padx=20, pady=(0, 10))
             return
 
-        # container com scroll
+        # Área scrollável
         container = ttk.Frame(content, style='Card.TFrame')
         container.pack(fill='both', expand=True, padx=20, pady=10)
 
@@ -1111,15 +1301,17 @@ class ScoreAmbientalClient:
         scrollbar = ttk.Scrollbar(container, orient="vertical", command=canvas.yview)
         scrollable_frame = ttk.Frame(canvas, style='Card.TFrame')
 
+        # Ajusta região de scroll conforme o conteúdo cresce
         def on_configure(e):
             canvas.configure(scrollregion=canvas.bbox("all"))
 
         scrollable_frame.bind("<Configure>", on_configure)
 
+        # Cria uma "janela" dentro do canvas onde vai ficar nosso frame rolável
         canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
         canvas.configure(yscrollcommand=scrollbar.set)
 
-        # cabeçalho
+        # Cabeçalho da tabela (posição, nome, nível, pontos)
         header_row = ttk.Frame(scrollable_frame, style='Card.TFrame')
         header_row.grid(row=0, column=0, sticky='w', pady=(0, 10))
 
@@ -1132,20 +1324,28 @@ class ScoreAmbientalClient:
         ttk.Label(header_row, text="Pontuação", style='FormLabel.TLabel',
                   background='white', width=15).grid(row=0, column=3, padx=5, sticky='e')
 
-        # linhas do ranking
+        # Linhas do ranking
         for i, usuario in enumerate(resposta, 1):
             linha = ttk.Frame(scrollable_frame, style='Card.TFrame')
             linha.grid(row=i, column=0, sticky='w')
 
+            # Se for o usuário logado, destaca com fundo azul claro
             destaque = (usuario.get('id') == self.usuario_id)
             bg_color = '#E3F2FD' if destaque else 'white'
 
-            tk.Label(linha, text=f"{i}º", anchor='w', width=10, bg=bg_color).grid(row=0, column=0, padx=5, pady=2, sticky='w')
-            tk.Label(linha, text=usuario.get('nome', ''), anchor='w', width=30, bg=bg_color).grid(row=0, column=1, padx=5, pady=2, sticky='w')
-            tk.Label(linha, text=str(usuario.get('nivel', '')), anchor='e', width=10, bg=bg_color).grid(row=0, column=2, padx=5, pady=2, sticky='e')
-            tk.Label(linha, text=str(usuario.get('pontuacao_total', '')), anchor='e', width=15, bg=bg_color).grid(row=0, column=3, padx=5, pady=2, sticky='e')
+            tk.Label(linha, text=f"{i}º", anchor='w', width=10, bg=bg_color).grid(
+                row=0, column=0, padx=5, pady=2, sticky='w')
 
-        # posiciona scroll
+            tk.Label(linha, text=usuario.get('nome', ''), anchor='w', width=30, bg=bg_color).grid(
+                row=0, column=1, padx=5, pady=2, sticky='w')
+
+            tk.Label(linha, text=str(usuario.get('nivel', '')), anchor='e', width=10, bg=bg_color).grid(
+                row=0, column=2, padx=5, pady=2, sticky='e')
+
+            tk.Label(linha, text=str(usuario.get('pontuacao_total', '')), anchor='e', width=15, bg=bg_color).grid(
+                row=0, column=3, padx=5, pady=2, sticky='e')
+
+        # Monta o scroll na tela
         container.grid_columnconfigure(0, weight=1)
         container.grid_rowconfigure(0, weight=1)
 
@@ -1154,9 +1354,14 @@ class ScoreAmbientalClient:
 
 
 # ========================
-# MAIN
+# MAIN / ENTRADA DO PROGRAMA
 # ========================
 if __name__ == "__main__":
+    # Cria janela Tk
     root = tk.Tk()
+
+    # Cria a aplicação toda dentro da janela
     app = ScoreAmbientalClient(root)
+
+    # Inicia o loop de eventos do Tkinter (janela interativa)
     root.mainloop()
