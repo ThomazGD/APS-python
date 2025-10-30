@@ -70,11 +70,11 @@
     "nome": "thomaz",
     "email": "thomaz@gmail.com",
     "senha": "thomaz2012",
-    "nivel": 1,
-    "pontuacao_total": 144,
+    "nivel": 2,
+    "pontuacao_total": 146,
     "categorias": {
       "Água": {
-        "pontos": 144,
+        "pontos": 146,
         "meta": 200,
         "nivel": 2
       },
@@ -160,6 +160,13 @@
         "data": "2025-10-30T15:43:21.218390",
         "categoria": "Água",
         "descricao": "teste",
+        "pontos": 2
+      },
+      {
+        "id": "653bc508-53c5-454a-96ec-9c916ffda0e8",
+        "data": "2025-10-30T16:41:02.296768",
+        "categoria": "Água",
+        "descricao": "btb",
         "pontos": 2
       }
     ],
