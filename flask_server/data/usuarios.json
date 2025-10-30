@@ -1,0 +1,169 @@
+{
+  "84f381dd-6131-4eeb-99e2-4e4cf427702b": {
+    "id": "84f381dd-6131-4eeb-99e2-4e4cf427702b",
+    "nome": "teste",
+    "email": "teste@gmail.com",
+    "senha": "teste123",
+    "nivel": 1,
+    "pontuacao_total": 7,
+    "categorias": {
+      "Água": {
+        "pontos": 7,
+        "meta": 100,
+        "nivel": 1
+      },
+      "Energia": {
+        "pontos": 0,
+        "meta": 100,
+        "nivel": 1
+      },
+      "Mobilidade": {
+        "pontos": 0,
+        "meta": 100,
+        "nivel": 1
+      },
+      "Alimentação": {
+        "pontos": 0,
+        "meta": 100,
+        "nivel": 1
+      },
+      "Resíduos": {
+        "pontos": 0,
+        "meta": 100,
+        "nivel": 1
+      },
+      "Bem-estar": {
+        "pontos": 0,
+        "meta": 100,
+        "nivel": 1
+      },
+      "Consumo Consciente": {
+        "pontos": 0,
+        "meta": 100,
+        "nivel": 1
+      },
+      "Educação Ambiental": {
+        "pontos": 0,
+        "meta": 100,
+        "nivel": 1
+      },
+      "Tecnologia Verde": {
+        "pontos": 0,
+        "meta": 100,
+        "nivel": 1
+      }
+    },
+    "historico": [
+      {
+        "id": "5a45b7ae-0340-4e70-a68d-6d8ac47745da",
+        "data": "2025-10-30T14:03:37.519637",
+        "categoria": "Água",
+        "descricao": "tomei banho rapido e depois me enxuguei",
+        "pontos": 7
+      }
+    ],
+    "termos_aprendidos": {},
+    "data_criacao": "2025-10-30T14:02:49.226957"
+  },
+  "98506745-7b91-41e0-949f-6b40bbbf71ba": {
+    "id": "98506745-7b91-41e0-949f-6b40bbbf71ba",
+    "nome": "thomaz",
+    "email": "thomaz@gmail.com",
+    "senha": "thomaz2012",
+    "nivel": 1,
+    "pontuacao_total": 144,
+    "categorias": {
+      "Água": {
+        "pontos": 144,
+        "meta": 200,
+        "nivel": 2
+      },
+      "Energia": {
+        "pontos": 0,
+        "meta": 100,
+        "nivel": 1
+      },
+      "Mobilidade": {
+        "pontos": 0,
+        "meta": 100,
+        "nivel": 1
+      },
+      "Alimentação": {
+        "pontos": 0,
+        "meta": 100,
+        "nivel": 1
+      },
+      "Resíduos": {
+        "pontos": 0,
+        "meta": 100,
+        "nivel": 1
+      },
+      "Bem-estar": {
+        "pontos": 0,
+        "meta": 100,
+        "nivel": 1
+      },
+      "Consumo Consciente": {
+        "pontos": 0,
+        "meta": 100,
+        "nivel": 1
+      },
+      "Educação Ambiental": {
+        "pontos": 0,
+        "meta": 100,
+        "nivel": 1
+      },
+      "Tecnologia Verde": {
+        "pontos": 0,
+        "meta": 100,
+        "nivel": 1
+      }
+    },
+    "historico": [
+      {
+        "id": "c1677b8e-2027-4554-afb9-e97c738e6548",
+        "data": "2025-10-30T15:19:33.526109",
+        "categoria": "Água",
+        "descricao": "testei se o banho e legal e realmente e legal",
+        "pontos": 20
+      },
+      {
+        "id": "5c57419c-bc69-4beb-b730-797205a8a93e",
+        "data": "2025-10-30T15:19:47.809374",
+        "categoria": "Água",
+        "descricao": "testei se o banho e legal e realmente e legal",
+        "pontos": 20
+      },
+      {
+        "id": "14620e1f-afe3-4bf1-9fe3-ae07a9688c61",
+        "data": "2025-10-30T15:33:58.639381",
+        "categoria": "Água",
+        "descricao": "aaaa",
+        "pontos": 2
+      },
+      {
+        "id": "33827f49-ace6-45ba-90f6-36c18baaff50",
+        "data": "2025-10-30T15:35:26.937920",
+        "categoria": "Água",
+        "descricao": "k k k k kk k k k k  k k  k k k k kk  k k k  k k k kk  k kk k k k k k k k k k",
+        "pontos": 50
+      },
+      {
+        "id": "f690b2a3-13c6-40cd-9e66-036ad35f3cdb",
+        "data": "2025-10-30T15:35:32.425739",
+        "categoria": "Água",
+        "descricao": "k k k k kk k k k k  k k  k k k k kk  k k k  k k k kk  k kk k k k k k k k k k",
+        "pontos": 50
+      },
+      {
+        "id": "60ad60f8-bb71-4a2c-b106-7abf4f6a85fa",
+        "data": "2025-10-30T15:43:21.218390",
+        "categoria": "Água",
+        "descricao": "teste",
+        "pontos": 2
+      }
+    ],
+    "termos_aprendidos": {},
+    "data_criacao": "2025-10-30T14:04:08.795321"
+  }
+}

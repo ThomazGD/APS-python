@@ -1,39 +1,176 @@
 {
   "nome": "Usuário",
   "nivel": 1,
-  "pontuacao_total": 29,
+  "pontuacao_total": 16,
   "categorias": {
     "Água": {
-      "pontos": 0,
-      "meta": 100
+      "pontos": 16,
+      "meta": 100,
+      "nivel": 1
     },
     "Energia": {
       "pontos": 0,
-      "meta": 100
+      "meta": 100,
+      "nivel": 1
     },
     "Mobilidade": {
       "pontos": 0,
-      "meta": 100
+      "meta": 100,
+      "nivel": 1
     },
     "Alimentação": {
-      "pontos": 29,
-      "meta": 100
+      "pontos": 0,
+      "meta": 100,
+      "nivel": 1
     },
     "Resíduos": {
       "pontos": 0,
-      "meta": 100
+      "meta": 100,
+      "nivel": 1
     },
     "Bem-estar": {
       "pontos": 0,
-      "meta": 100
+      "meta": 100,
+      "nivel": 1
+    },
+    "Consumo Consciente": {
+      "pontos": 0,
+      "meta": 100,
+      "nivel": 1
+    },
+    "Educação Ambiental": {
+      "pontos": 0,
+      "meta": 100,
+      "nivel": 1
+    },
+    "Tecnologia Verde": {
+      "pontos": 0,
+      "meta": 100,
+      "nivel": 1
     }
   },
   "historico": [
     {
-      "data": "28/10/2025 16:47",
-      "atividade": "Alimentação: comi uma maça",
-      "categoria": "Alimentação",
-      "pontos": 29
+      "data": "30/10/2025 15:23",
+      "categoria": "Água",
+      "atividade": "aaaa",
+      "pontos": 16
     }
-  ]
+  ],
+  "termos_aprendidos": {
+    "Água": {
+      "aaaa": {
+        "vezes_usado": 1,
+        "peso": 1.2
+      }
+    }
+  },
+  "usuarios": {
+    "Usuário": {
+      "nome": "Usuário",
+      "nivel": 1,
+      "pontuacao_total": 145,
+      "categorias": {
+        "Água": {
+          "pontos": 28,
+          "meta": 100,
+          "nivel": 1
+        },
+        "Energia": {
+          "pontos": 55,
+          "meta": 100,
+          "nivel": 1
+        },
+        "Mobilidade": {
+          "pontos": 33,
+          "meta": 100,
+          "nivel": 1
+        },
+        "Alimentação": {
+          "pontos": 29,
+          "meta": 100,
+          "nivel": 1
+        },
+        "Resíduos": {
+          "pontos": 0,
+          "meta": 100,
+          "nivel": 1
+        },
+        "Bem-estar": {
+          "pontos": 0,
+          "meta": 100,
+          "nivel": 1
+        }
+      },
+      "historico": [
+        {
+          "data": "28/10/2025 16:47",
+          "atividade": "Alimentação: comi uma maça",
+          "categoria": "Alimentação",
+          "pontos": 29
+        },
+        {
+          "data": "30/10/2025 11:46",
+          "categoria": "Energia",
+          "atividade": "fiquei no celular o dita todo",
+          "pontos": 55
+        },
+        {
+          "data": "30/10/2025 13:43",
+          "categoria": "Água",
+          "atividade": "fui de carona com meu amigo de skate",
+          "pontos": 28
+        },
+        {
+          "data": "30/10/2025 13:44",
+          "categoria": "Mobilidade",
+          "atividade": "futebol e muito legal gosto de blue lock",
+          "pontos": 33
+        }
+      ],
+      "termos_aprendidos": {
+        "Água": {
+          "fui": {
+            "vezes_usado": 1,
+            "peso": 0.3
+          },
+          "carona": {
+            "vezes_usado": 1,
+            "peso": 0.3
+          },
+          "amigo": {
+            "vezes_usado": 1,
+            "peso": 0.3
+          },
+          "skate": {
+            "vezes_usado": 1,
+            "peso": 0.3
+          }
+        },
+        "Mobilidade": {
+          "futebol": {
+            "vezes_usado": 1,
+            "peso": 0.24
+          },
+          "legal": {
+            "vezes_usado": 1,
+            "peso": 0.24
+          },
+          "gosto": {
+            "vezes_usado": 1,
+            "peso": 0.24
+          },
+          "blue": {
+            "vezes_usado": 1,
+            "peso": 0.24
+          },
+          "lock": {
+            "vezes_usado": 1,
+            "peso": 0.24
+          }
+        }
+      }
+    }
+  },
+  "proximo_id": 1
 }
