@@ -1,10 +1,7 @@
 import tkinter as tk
 from tkinter import ttk, messagebox, font
-import json
-import os
 import requests
 from datetime import datetime, timedelta
-from tkinter import simpledialog
 
 # ========================
 # CONFIGURAÇÕES GERAIS
@@ -360,8 +357,45 @@ class ScoreAmbientalClient:
         self.mostrar_tela_login()
 
     # -------------------------------------------------
-    # LÓGICA DE PONTOS / NÍVEL
+    # LÓGICA DE NÍVEL
     # -------------------------------------------------
+
+    def atualizar_nivel_local_e_api(self):
+        """
+        Garante que o nível do usuário bate com a pontuação total.
+        Regra: cada 100 pontos sobe 1 nível.
+
+        Exemplo:
+            0-99   -> nível 1
+            100-199-> nível 2
+            200-299-> nível 3
+            ...
+        """
+        if not self.usuario:
+            return
+
+        pontos_totais = self.usuario.get('pontuacao_total', 0)
+        nivel_atual = self.usuario.get('nivel', 1)
+
+        # calcula nível correto a partir dos pontos
+        nivel_calculado = max(1, (pontos_totais // 100) + 1)
+
+        # se já está igual, não precisa fazer nada
+        if nivel_calculado == nivel_atual:
+            return
+
+        # Atualiza localmente
+        self.usuario['nivel'] = nivel_calculado
+
+        # Tenta atualizar no backend também (se sua API aceitar PUT /usuarios/<id>)
+        payload = {
+            'nivel': nivel_calculado
+        }
+        _ = self.fazer_requisicao(
+            'PUT',
+            f'/usuarios/{self.usuario_id}',
+            payload
+        )
 
     def calcular_pontos_para_proximo_nivel(self):
         """
@@ -397,6 +431,8 @@ class ScoreAmbientalClient:
         dados = self.fazer_requisicao('GET', f'/usuarios/{self.usuario_id}')
         if dados:
             self.usuario = dados
+            # >>> NOVO: garante que nivel bate com pontos <<<
+            self.atualizar_nivel_local_e_api()
 
         historico = self.usuario.get('historico', [])
         if not isinstance(historico, list):
@@ -699,6 +735,7 @@ class ScoreAmbientalClient:
         Dispara POST /login com email e senha.
         Se sucesso:
           - salva self.usuario_id e self.usuario
+          - atualiza nível do usuário com base nos pontos
           - mostra o dashboard principal
         Se falha:
           - mostra popup de erro
@@ -714,6 +751,10 @@ class ScoreAmbientalClient:
             # API precisa devolver: {sucesso: True, usuario_id: "...", usuario: {...}}
             self.usuario_id = response.get('usuario_id')
             self.usuario = response.get('usuario', {})
+
+            # >>> NOVO: garante que nivel bate com pontos <<<
+            self.atualizar_nivel_local_e_api()
+
             self.mostrar_tela_principal()
         else:
             messagebox.showerror("Erro de Login", "Email ou senha inválidos.")
@@ -1035,9 +1076,12 @@ class ScoreAmbientalClient:
                 if user_atualizado:
                     self.usuario = user_atualizado
 
+                # >>> NOVO: garante que nivel bate com pontos <<<
+                self.atualizar_nivel_local_e_api()
+
                 messagebox.showinfo(
                     "Sucesso",
-                    f"Atividade registrada! (+{pontos} pts)"
+                    f"Atividade registrado! (+{pontos} pts)"
                 )
                 self.mostrar_tela_principal()
             else:
@@ -1075,6 +1119,9 @@ class ScoreAmbientalClient:
         resposta = self.fazer_requisicao('GET', f'/usuarios/{self.usuario_id}')
         if resposta:
             self.usuario = resposta
+
+            # >>> NOVO: garante que nivel bate com pontos <<<
+            self.atualizar_nivel_local_e_api()
 
         frame_progresso = ttk.Frame(content, style='Card.TFrame')
         frame_progresso.pack(pady=20, padx=20, fill='x')
